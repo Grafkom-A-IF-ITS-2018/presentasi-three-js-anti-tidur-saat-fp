@@ -30,15 +30,15 @@
 
         var camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-        var webGLRenderer = new THREE.WebGLRenderer();
+        var webGLRenderer = new THREE.WebGLRenderer({antialias: true});
         webGLRenderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0));
         webGLRenderer.setSize(window.innerWidth, window.innerHeight);
         webGLRenderer.shadowMapEnabled = true;
 
 
-        camera.position.x = 0;
-        camera.position.y = 0;
-        camera.position.z = 100;
+        camera.position.x = 90;
+        camera.position.y = 90;
+        camera.position.z = 90;
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 
@@ -74,8 +74,8 @@
             this.SphereCPosY = 0;
             this.SphereCPosZ = 0;
 
-            this.groupPosX = 100;
-            this.groupPosY = 5;
+            this.groupPosX = 0;
+            this.groupPosY = 0;
             this.groupPosZ = 0;
 
             this.grouping = false;
@@ -89,29 +89,46 @@
             this.redraw = function () {
                 scene.remove(group);
 
-                sphereA = createMesh(new THREE.SphereGeometry(5, 10, 10));
-                sphereB = createMesh(new THREE.SphereGeometry(5, 10, 10));
+                sphereA = new THREE.Mesh(new THREE.SphereGeometry(5, 10, 10), new THREE.MeshLambertMaterial({color: 0xf104f0}));
+                sphereB = new THREE.Mesh(new THREE.SphereGeometry(5, 10, 10), new THREE.MeshPhongMaterial({color: 0x0104f0}));
+                //sphereB = createMesh(new THREE.SphereGeometry(5, 10, 10));
                 sphereC = createMesh(new THREE.SphereGeometry(5, 10, 10));
 
                 sphereA.position.set(controls.SphereAPosX, controls.SphereAPosY, controls.SphereAPosZ);
                 sphereB.position.set(controls.SphereBPosX, controls.SphereBPosY, controls.SphereBPosZ);
                 sphereC.position.set(controls.SphereCPosX, controls.SphereCPosY, controls.SphereCPosZ);
 
+                var lights = [];
+			    lights[0] = new THREE.PointLight( 0xffffff, 1, 0 );
+			    lights[1] = new THREE.PointLight( 0xff00ff, 1, 0 );
+			    lights[2] = new THREE.PointLight( 0xf0ff0f, 1, 0 );
+
+			    lights[0].position.set( 0, 200, 0 );
+    			lights[1].position.set( 100, 200, 100 );
+    			lights[2].position.set( - 100, - 200, - 100 );
+
+    			scene.add(lights[0]);
+    			scene.add(lights[1]);
+    			scene.add(lights[2]);
 
                 group = new THREE.Group();
                 group.add(sphereA);
                 group.add(sphereB);
                 group.add(sphereC);
 
-                group.position.x = 9;
+                group.position.x = 0;
                 group.position.y = 0;
                 group.position.z = 0;
 
                 scene.add(group);
                 //controls.positionBoundingBox();
 
-                var arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), group.position, 10, 0x0000ff);
-                //scene.add(arrow);
+                var arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), group.position, 100, 0x0000ff);
+                scene.add(arrow);
+                var arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), group.position, 100, 0x0000ff);
+                scene.add(arrow);
+                var arrow = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), group.position, 100, 0x0000ff);
+                scene.add(arrow);
             };
 
             this.positionBoundingBox = function () {
@@ -213,6 +230,8 @@
 
             if (controls.grouping && controls.rotate) {
                 group.rotation.z += step;
+                group.rotation.y += step;
+                group.rotation.x += step;
             }
 
             if (controls.rotate && !controls.grouping) {
