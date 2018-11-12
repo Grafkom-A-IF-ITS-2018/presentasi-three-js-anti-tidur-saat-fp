@@ -28,7 +28,7 @@
 
         var scene = new THREE.Scene();
 
-        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        var camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 1000);
 
         var webGLRenderer = new THREE.WebGLRenderer();
         webGLRenderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0));
@@ -36,9 +36,9 @@
         webGLRenderer.shadowMapEnabled = true;
 
 
-        camera.position.x = 45;
-        camera.position.y = 45;
-        camera.position.z = 45;
+        camera.position.x = 0;
+        camera.position.y = 0;
+        camera.position.z = 100;
         camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 
@@ -57,19 +57,24 @@
 
         var sphereA;
         var sphereB;
+        var sphereC;
         var group;
         var bboxMesh;
 
         var controls = new function () {
             this.SphereAPosX = 0;
-            this.SphereAPosY = 3;
-            this.SphereAPosZ = 10;
+            this.SphereAPosY = 13;
+            this.SphereAPosZ = 0;
 
-            this.SphereBPosX = 10;
-            this.SphereBPosY = 3;
-            this.SphereBPosZ = 20;
+            this.SphereBPosX = 0;
+            this.SphereBPosY = -13;
+            this.SphereBPosZ = 0;
 
-            this.groupPosX = 10;
+            this.SphereCPosX = 0;
+            this.SphereCPosY = 0;
+            this.SphereCPosZ = 0;
+
+            this.groupPosX = 100;
             this.groupPosY = 5;
             this.groupPosZ = 0;
 
@@ -86,19 +91,27 @@
 
                 sphereA = createMesh(new THREE.SphereGeometry(5, 10, 10));
                 sphereB = createMesh(new THREE.SphereGeometry(5, 10, 10));
+                sphereC = createMesh(new THREE.SphereGeometry(5, 10, 10));
 
                 sphereA.position.set(controls.SphereAPosX, controls.SphereAPosY, controls.SphereAPosZ);
                 sphereB.position.set(controls.SphereBPosX, controls.SphereBPosY, controls.SphereBPosZ);
+                sphereC.position.set(controls.SphereCPosX, controls.SphereCPosY, controls.SphereCPosZ);
+
 
                 group = new THREE.Group();
                 group.add(sphereA);
                 group.add(sphereB);
+                group.add(sphereC);
+
+                group.position.x = 9;
+                group.position.y = 0;
+                group.position.z = 0;
 
                 scene.add(group);
-                controls.positionBoundingBox();
+                //controls.positionBoundingBox();
 
                 var arrow = new THREE.ArrowHelper(new THREE.Vector3(0, 1, 0), group.position, 10, 0x0000ff);
-                scene.add(arrow);
+                //scene.add(arrow);
             };
 
             this.positionBoundingBox = function () {
@@ -108,11 +121,11 @@
                 var height = box.max.y - box.min.y;
                 var depth = box.max.z - box.min.z;
 
-                var bbox = new THREE.BoxGeometry(width, height, depth);
+                var bbox = new THREE.BoxGeometry(width, height+1000, depth);
                 bboxMesh = new THREE.Mesh(bbox, new THREE.MeshBasicMaterial({
-                    color: 0x000000,
+                    color: 0x00FF00,
                     vertexColors: THREE.VertexColors,
-                    wireframeLinewidth: 2,
+                    wireframeLinewidth: 100,
                     wireframe: true
                 }));
 
@@ -163,19 +176,19 @@
         var groupFolder = gui.addFolder("group");
         groupFolder.add(controls, "groupPosX", -20, 20).onChange(function (e) {
             group.position.x = e;
-            controls.positionBoundingBox()
+            //controls.positionBoundingBox()
         });
         groupFolder.add(controls, "groupPosZ", -20, 20).onChange(function (e) {
             group.position.z = e;
-            controls.positionBoundingBox()
+            //controls.positionBoundingBox()
         });
         groupFolder.add(controls, "groupPosY", -20, 20).onChange(function (e) {
             group.position.y = e;
-            controls.positionBoundingBox()
+            //controls.positionBoundingBox()
         });
         groupFolder.add(controls, "groupScale", 0, 3).onChange(function (e) {
             group.scale.set(e, e, e);
-            controls.positionBoundingBox()
+            //controls.positionBoundingBox()
         });
 
         gui.add(controls, "grouping");
@@ -199,12 +212,14 @@
             stats.update();
 
             if (controls.grouping && controls.rotate) {
-                group.rotation.y += step;
+                group.rotation.z += step;
             }
 
             if (controls.rotate && !controls.grouping) {
                 sphereA.rotation.y += step;
-                sphereB.rotation.y += step;
+                sphereB.rotation.x += step;
+                sphereC.rotation.z += step;
+                
             }
 
             requestAnimationFrame(render);
