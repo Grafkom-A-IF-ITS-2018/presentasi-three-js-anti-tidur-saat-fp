@@ -5,7 +5,6 @@
 <head>
     <title>Merging Tutorial</title>
     <script type="text/javascript" src="three.js"></script>
-
     <script type="text/javascript" src="stats.js"></script>
     <script type="text/javascript" src="dat.gui.js"></script>
     <style>
@@ -44,15 +43,17 @@
 
         var step = 0;
 
+        var maxObj = 2000;
+        
         var sphereMaterial = new THREE.MeshNormalMaterial({color: 0x00ff00, transparent: true, opacity: 0.5});
+        
         var controls = new function () {
             this.cameraNear = camera.near;
             this.cameraFar = camera.far;
             this.rotationSpeed = 0.5;
             this.combined = false;
 
-
-            this.numberOfObjects = 100;
+            this.numberOfObjects = 20;
 
             this.redraw = function () {
                 var toRemove = [];
@@ -79,6 +80,21 @@
                 }
             };
 
+            this.duplicated = function () {
+                controls.numberOfObjects*=2;
+                if(controls.numberOfObjects > maxObj)controls.numberOfObjects = maxObj;
+                controls.redraw();
+            }
+
+            this.divided = function(){
+                controls.numberOfObjects/=2;
+                if(controls.numberOfObjects < 0)controls.numberOfObjects = 1;
+                controls.redraw();
+            }
+
+            this.alert = function(){
+                alert("Number of objects : " + controls.numberOfObjects);
+            }
 
             this.addSphere = addSphere;
 
@@ -89,9 +105,11 @@
 
         var gui = new dat.GUI();
 
-        gui.add(controls, 'numberOfObjects', 0, 3000);
         gui.add(controls, 'combined').onChange(controls.redraw);
+        gui.add(controls, 'duplicated')
+        gui.add(controls, 'divided')
         gui.add(controls, 'redraw');
+        gui.add(controls, 'alert')
 
 
         controls.redraw();
@@ -103,18 +121,18 @@
         function addSphere() {
             var sphereGeometry = new THREE.SphereGeometry(1, 10, 10);
 
-            var cube = new THREE.Mesh(sphereGeometry, sphereMaterial);
-            cube.castShadow = true;
+            var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            sphere.castShadow = true;
 
-            cube.position.x = -60 + Math.round((Math.random() * 100));
-            cube.position.y = Math.round((Math.random() * 10));
-            cube.position.z = -150 + Math.round((Math.random() * 175));
+            sphere.position.x = -60 + Math.round((Math.random() * 100));
+            sphere.position.y = Math.round((Math.random() * 10));
+            sphere.position.z = -150 + Math.round((Math.random() * 175));
 
-            return cube;
+            return sphere;
         }
         
         function render() {
-            rotation += 0.005;
+            rotation += 0.01;
             stats.update();
             camera.position.x = Math.sin(rotation) * 50;
             camera.position.z = Math.cos(rotation) * 50;
