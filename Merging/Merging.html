@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Merging Tutorial</title>
+    <script type="text/javascript" src="three.js"></script>
+
+    <script type="text/javascript" src="stats.js"></script>
+    <script type="text/javascript" src="dat.gui.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Stats-output"></div>
+<div id="WebGL-output"></div>
+
+<script type="text/javascript">
+
+    function init() {
+        var stats = initStats();
+
+        var scene = new THREE.Scene();
+
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 500);
+
+        var renderer = new THREE.WebGLRenderer();
+
+        renderer.setClearColor(new THREE.Color(0x00000, 1.0));
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMapEnabled = true;
+
+        camera.position.x = 45;
+        camera.position.y = 45;
+        camera.position.z = 45;
+        camera.lookAt(scene.position);
+
+        document.getElementById("WebGL-output").appendChild(renderer.domElement);
+
+        var step = 0;
+
+        var sphereMaterial = new THREE.MeshNormalMaterial({color: 0x00ff00, transparent: true, opacity: 0.5});
+        var controls = new function () {
+            this.cameraNear = camera.near;
+            this.cameraFar = camera.far;
+            this.rotationSpeed = 0.5;
+            this.combined = false;
+
+
+            this.numberOfObjects = 500;
+
+            this.redraw = function () {
+                var toRemove = [];
+                scene.traverse(function (e) {
+                    if (e instanceof THREE.Mesh) toRemove.push(e);
+                });
+                toRemove.forEach(function (e) {
+                    scene.remove(e)
+                });
+
+                if (controls.combined) {
+                    var geometry = new THREE.Geometry();
+                    for (var i = 0; i < controls.numberOfObjects; i++) {
+                        var sphereMesh = addSphere();
+                        sphereMesh.updateMatrix();
+                        geometry.merge(sphereMesh.geometry, sphereMesh.matrix);
+                    }
+                    scene.add(new THREE.Mesh(geometry, sphereMaterial));
+
+                } else {
+                    for (var i = 0; i < controls.numberOfObjects; i++) {
+                        scene.add(controls.addSphere());
+                    }
+                }
+            };
+
+
+            this.addSphere = addSphere;
+
+            this.outputObjects = function () {
+                console.log(scene.children);
+            }
+        };
+
+        var gui = new dat.GUI();
+
+        gui.add(controls, 'numberOfObjects', 0, 20000);
+        gui.add(controls, 'combined').onChange(controls.redraw);
+        gui.add(controls, 'redraw');
+
+
+        controls.redraw();
+
+        render();
+
+        var rotation = 0;
+
+        function addSphere() {
+            var sphereGeometry = new THREE.SphereGeometry(1, 10, 10);
+
+            var cube = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            cube.castShadow = true;
+
+            cube.position.x = -60 + Math.round((Math.random() * 100));
+            cube.position.y = Math.round((Math.random() * 10));
+            cube.position.z = -150 + Math.round((Math.random() * 175));
+
+            return cube;
+        }
+        
+        function render() {
+            rotation += 0.005;
+            stats.update();
+            camera.position.x = Math.sin(rotation) * 50;
+            camera.position.z = Math.cos(rotation) * 50;
+            camera.lookAt(scene.position);
+
+            requestAnimationFrame(render);
+            renderer.render(scene, camera);
+        }
+
+        function initStats() {
+
+            var stats = new Stats();
+
+            stats.setMode(0);
+
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
+
+            document.getElementById("Stats-output").appendChild(stats.domElement);
+
+            return stats;
+        }
+    }
+    window.onload = init;
+</script>
+</body>
+</html>

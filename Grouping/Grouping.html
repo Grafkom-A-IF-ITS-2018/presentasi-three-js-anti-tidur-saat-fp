@@ -53,7 +53,6 @@
 */
         document.getElementById("WebGL-output").appendChild(webGLRenderer.domElement);
 
-        // call the render function
         var step = 0.03;
 
         var sphereA;
@@ -61,9 +60,7 @@
         var group;
         var bboxMesh;
 
-        // setup the control gui
         var controls = new function () {
-            // we need the first child, since it's a multimaterial
             this.SphereAPosX = 0;
             this.SphereAPosY = 3;
             this.SphereAPosZ = 10;
@@ -188,13 +185,11 @@
 
         function createMesh(geom) {
 
-            // assign two materials
             var meshMaterial = new THREE.MeshNormalMaterial();
             meshMaterial.side = THREE.DoubleSide;
             var wireFrameMat = new THREE.MeshBasicMaterial();
             wireFrameMat.wireframe = true;
 
-            // create a multimaterial
             var plane = THREE.SceneUtils.createMultiMaterialObject(geom, [meshMaterial, wireFrameMat]);
 
             return plane;
@@ -212,18 +207,13 @@
                 sphereB.rotation.y += step;
             }
 
-//        controls.positionBoundingBox();
-            // render using requestAnimationFrame
             requestAnimationFrame(render);
             webGLRenderer.render(scene, camera);
         }
 
         function initStats() {
-
             var stats = new Stats();
-            stats.setMode(0); // 0: fps, 1: ms
-
-            // Align top-left
+            stats.setMode(0);
             stats.domElement.style.position = 'absolute';
             stats.domElement.style.left = '0px';
             stats.domElement.style.top = '0px';
@@ -233,8 +223,6 @@
             return stats;
         }
 
-
-        // http://jsfiddle.net/MREL4/
         function setFromObject(object) {
             var box = new THREE.Box3();
             var v1 = new THREE.Vector3();
@@ -255,7 +243,6 @@
     };
 
     window.onload = init;
-
 
 </script>
 </body>
