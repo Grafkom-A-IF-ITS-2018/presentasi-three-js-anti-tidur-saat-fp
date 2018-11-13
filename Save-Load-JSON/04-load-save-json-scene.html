@@ -115,7 +115,7 @@
             this.exportScene = function () {
                 var exporter = new THREE.SceneExporter();
                 var sceneJson = JSON.stringify(exporter.parse(scene));
-                localStorage.setItem('scene', sceneJson);
+                window.localStorage.setItem('scene', sceneJson);
             };
 
             this.clearScene = function () {
@@ -123,7 +123,7 @@
             };
 
             this.importScene = function () {
-                var json = (localStorage.getItem('scene'));
+                var json = (window.localStorage.getItem('scene'));
                 var sceneLoader = new THREE.SceneLoader();
 
                 sceneLoader.parse(JSON.parse(json), function (e) {

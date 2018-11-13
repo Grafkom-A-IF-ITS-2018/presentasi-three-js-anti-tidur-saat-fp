@@ -86,14 +86,14 @@
 
             this.save = function () {
                 var result = knot.toJSON();
-                windowlocalStorage.setItem("json", JSON.stringify(result));
+                window.localStorage.setItem("json", JSON.stringify(result));
             };
 
             this.load = function () {
 
                 scene.remove(loadedMesh);
 
-                var json = localStorage.getItem("json");
+                var json = window.localStorage.getItem("json");
 
                 if (json) {
                     var loadedGeometry = JSON.parse(json);
